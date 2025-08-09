@@ -1,7 +1,7 @@
 import jsonwebtoken from 'jsonwebtoken'
 import config from '@/config'
-import { Admin, Token, User } from '@/models'
 import * as enums from '@/constants/enums'
+import { Token, User } from '@/models'
 
 export const userAuthenticate = async (req, res, next) => {
     try {
@@ -9,22 +9,16 @@ export const userAuthenticate = async (req, res, next) => {
 
         const token = isRefreshing ? req.cookies.refreshToken : req.headers.authorization.split(' ')[1]
         const decoded = jsonwebtoken.verify(token, config.AUTH_PUBLIC_KEY, { algorithms: ['RS256'] })
-        // console.log('decoded: ', decoded);
-        let adminUser = null
 
-        if (decoded?.role === enums.ADMIN_ROLES.USER) {
-            adminUser = await User.findById(decoded._id).lean()
-        } else {
-            adminUser = await Admin.findById(decoded._id, { password: 0 }).lean()
-        }
+        const user = await User.findById(decoded.userId).lean()
 
-        const tokenRecord = await Token.findOne({ [isRefreshing ? 'refreshToken' : 'accessToken']: token }).lean()
+        const tokenRecord = await Token.findOne({ sessionId: decoded.sessionId }).lean()
 
         if (!tokenRecord) {
             return res.status(401).json({ success: false, message: 'Unauthorized' })
         }
 
-        if (!adminUser) {
+        if (!user) {
             return res.status(401).json({ success: false, message: 'Unauthorized' })
         }
 
@@ -32,11 +26,11 @@ export const userAuthenticate = async (req, res, next) => {
             return res.status(401).json({ success: false, message: 'Unauthorized' })
         }
 
-        if (adminUser.status !== enums.ADMIN_STATES.ACTIVE) {
+        if (user.status !== enums.USER_STATES.ACTIVE && user.status !== enums.USER_STATES.PENDING) {
             return res.status(401).json({ success: false, message: 'Unauthorized' })
         }
 
-        req.user = adminUser
+        req.user = user
         req.user.sessionId = tokenRecord.sessionId
 
         return next()
@@ -46,10 +40,6 @@ export const userAuthenticate = async (req, res, next) => {
     }
 }
 
-export const decodeRefresh = (token) => {
-    try {
-        return jsonwebtoken.verify(token, config.AUTH_PUBLIC_KEY, { algorithms: ['RS256'] })
-    } catch (error) {
-        console.error('error: ', error)
-    }
+export const decodeJWT = (token) => {
+    return jsonwebtoken.decode(token)
 }
