@@ -26,7 +26,7 @@ STORE_DIR = os.path.join(os.path.dirname(__file__), "..", "store")
 
 ASTRA_DB_SECRET_KEY = config.get("ASTRA_DB_SECRET_KEY", cast=str)
 ASTRA_DB_ENDPOINT = config.get("ASTRA_DB_ENDPOINT", cast=str)
-ASTRA_DB_KEYSPACE  = config.get("ASTRA_DB_KEYSPACE", cast=str)
+ASTRA_DB_KEYSPACE = config.get("ASTRA_DB_KEYSPACE", cast=str)
 GEMINI_API_KEY = config.get("GEMINI_API_KEY", cast=str)
 
 __access_public_key_path = os.path.join(
@@ -35,3 +35,9 @@ __access_public_key_path = os.path.join(
 
 JWT_ACCESS_KEY_PUBLIC = open(__access_public_key_path, "rb").read()
 
+HMAC_AGENT_KEY = config.get("HMAC_AGENT_KEY", cast=str)
+HMAC_USER_KEY = config.get("HMAC_USER_KEY", cast=str)
+
+API_HOST = config.get("API_HOST", cast=str)
+USER_HOST = config.get("USER_HOST", cast=str)
+FRONT_HOST = config.get("FRONT_HOST", cast=str)
