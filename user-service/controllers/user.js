@@ -109,7 +109,7 @@ export const updateCareerTasks = async (req, res) => {
         ).lean()
 
         if (updation.modifiedCount == 0) {
-            return res.status(400).json({ success: false, message: 'Could update the topic' })
+            return res.status(400).json({ success: false, message: 'Could not update the topic' })
         }
 
         return res.status(201).json({ success: true, message: 'Topic updated successfully' })
