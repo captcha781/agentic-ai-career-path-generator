@@ -9,6 +9,7 @@ from fastapi.exceptions import (
 )
 
 from backend.config.lifespan import lifespan
+from backend.config import main as config
 from backend.routes.index import router as index
 from backend.utils.pydanticToFormError import pydantic_to_form_error
 
@@ -27,7 +28,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[config.FRONT_HOST, config.USER_HOST],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
